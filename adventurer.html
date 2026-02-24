@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Adventurer — King Arthur Webquest</title>
+<meta name="description" content="Research the Knights of the Round Table, the Code of Chivalry, Sir Lancelot, Galahad, and legendary quests.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="The Adventurer — King Arthur Webquest">
+<meta property="og:description" content="Research the Knights of the Round Table, the Code of Chivalry, Sir Lancelot, Galahad, and legendary quests.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a12">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c; --gold-light: #e8c96a; --gold-dim: #8a6f2e;
+    --midnight: #0a0a12; --parchment: #f5edd8; --stone: #2a2438;
+    --role-color: #a05c2a; --role-glow: rgba(160,92,42,0.18);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background-color: var(--midnight); color: var(--parchment); font-family: 'EB Garamond', Georgia, serif; font-size: 18px; line-height: 1.7; overflow-x: hidden; }
+
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .stars::before, .stars::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1px 1px at 55% 20%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 75% 60%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1px 1px at 90% 15%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1px 1px at 20% 75%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1px 1px at 60% 80%, rgba(201,168,76,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 40% 55%, rgba(255,255,255,0.4) 0%, transparent 100%); }
+  .stars::after { animation: twinkle 4s ease-in-out infinite alternate; opacity: 0.7; }
+  @keyframes twinkle { from { opacity: 0.5; } to { opacity: 1; } }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; background: linear-gradient(to bottom, rgba(10,10,18,0.98), rgba(10,10,18,0.88)); border-bottom: 1px solid rgba(201,168,76,0.2); backdrop-filter: blur(10px); padding: 0 10px; }
+  nav a { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,237,216,0.55); text-decoration: none; padding: 16px 14px; transition: color 0.3s; position: relative; }
+  nav a::after { content: ''; position: absolute; bottom: 0; left: 50%; right: 50%; height: 2px; background: var(--gold); transition: left 0.3s, right 0.3s; }
+  nav a:hover, nav a.active { color: var(--gold); }
+  nav a:hover::after, nav a.active::after { left: 8%; right: 8%; }
+  .nav-divider { color: rgba(201,168,76,0.25); font-size: 10px; }
+
+  .role-hero { position: relative; min-height: 55vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 140px 40px 80px; z-index: 1; overflow: hidden; }
+  .role-hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse 70% 60% at 50% 40%, var(--role-glow) 0%, transparent 70%), radial-gradient(ellipse 50% 70% at 50% 100%, rgba(122,28,46,0.1) 0%, transparent 60%); }
+  .back-link { position: absolute; top: 78px; left: 40px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,168,76,0.5); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+  .back-link:hover { color: var(--gold); }
+  .role-badge { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--role-color); margin-bottom: 16px; opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards; }
+  .role-icon-lg { font-size: 64px; margin-bottom: 20px; opacity: 0; animation: fadeUp 0.8s 0.1s ease forwards; filter: drop-shadow(0 0 20px rgba(160,92,42,0.4)); }
+  .role-hero h1 { font-family: 'Cinzel Decorative', serif; font-size: clamp(2.2rem, 5vw, 4.5rem); font-weight: 900; line-height: 1.1; background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dim)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; opacity: 0; animation: fadeUp 0.8s 0.3s ease forwards; margin-bottom: 12px; }
+  .role-hero .subtitle { font-family: 'Cinzel', serif; font-size: clamp(0.75rem, 1.5vw, 0.95rem); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,237,216,0.45); opacity: 0; animation: fadeUp 0.8s 0.5s ease forwards; }
+  .ornament { display: flex; align-items: center; gap: 16px; opacity: 0; animation: fadeUp 0.8s 0.6s ease forwards; margin-top: 28px; }
+  .ornament-line { height: 1px; width: 80px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .ornament-diamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px rgba(201,168,76,0.6); }
+  .gold-divider { width: 100%; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.28), transparent); position: relative; z-index: 1; }
+
+  main { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 80px 40px 120px; }
+  .intro-block { background: linear-gradient(135deg, rgba(42,36,56,0.5), rgba(15,15,30,0.75)); border: 1px solid rgba(201,168,76,0.18); padding: 48px 52px; position: relative; margin-bottom: 64px; }
+  .intro-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .corner { position: absolute; width: 32px; height: 32px; border-color: rgba(201,168,76,0.35); border-style: solid; }
+  .corner.tl { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
+  .corner.tr { top: 10px; right: 10px; border-width: 1px 1px 0 0; }
+  .corner.bl { bottom: 10px; left: 10px; border-width: 0 0 1px 1px; }
+  .corner.br { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+  .intro-block p { color: rgba(245,237,216,0.8); line-height: 1.9; font-size: 1.05rem; }
+  .intro-block p + p { margin-top: 16px; }
+
+  .section-head { margin-bottom: 32px; }
+  .section-eyebrow { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .section-eyebrow::before { content: ''; display: inline-block; width: 32px; height: 1px; background: var(--gold); }
+  h2 { font-family: 'Cinzel Decorative', serif; font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 700; color: var(--parchment); line-height: 1.2; }
+  h2 .gold { color: var(--gold); }
+
+  .clusters { display: flex; flex-direction: column; gap: 40px; margin-bottom: 64px; }
+  .cluster { border-left: 2px solid rgba(201,168,76,0.2); padding-left: 28px; position: relative; }
+  .cluster::before { content: ''; position: absolute; left: -5px; top: 4px; width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px rgba(201,168,76,0.5); }
+  .cluster-title { font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .questions { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .questions li { display: flex; gap: 14px; align-items: flex-start; color: rgba(245,237,216,0.8); font-size: 1rem; line-height: 1.7; }
+  .q-num { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--gold); opacity: 0.7; flex-shrink: 0; margin-top: 3px; min-width: 24px; }
+
+  .resources { background: rgba(42,36,56,0.35); border: 1px solid rgba(201,168,76,0.14); padding: 40px 44px; margin-bottom: 64px; }
+  .resources h3 { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  .resource-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .resource-list li a { color: rgba(245,237,216,0.65); text-decoration: none; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; transition: color 0.3s; }
+  .resource-list li a:hover { color: var(--gold); }
+  .resource-list li a::before { content: '✦'; color: var(--gold); font-size: 0.65rem; flex-shrink: 0; margin-top: 5px; }
+
+  .role-nav { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; }
+  .role-nav a { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 16px; background: rgba(42,36,56,0.4); border: 1px solid rgba(201,168,76,0.1); text-decoration: none; color: rgba(245,237,216,0.55); transition: all 0.3s; text-align: center; }
+  .role-nav a:hover { background: rgba(42,36,56,0.7); border-color: rgba(201,168,76,0.35); color: var(--gold); }
+  .role-nav a.current { background: rgba(160,92,42,0.12); border-color: rgba(160,92,42,0.3); color: var(--gold); }
+  .role-nav .rn-icon { font-size: 1.6rem; }
+  .role-nav .rn-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  .img-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 64px; }
+  .img-strip-item { position: relative; overflow: hidden; cursor: pointer; aspect-ratio: 3/4; background: rgba(20,16,30,0.8); }
+  .img-strip-item img { width:100%; height:100%; object-fit:cover; filter:sepia(20%) brightness(0.82) contrast(1.05); transition:transform 0.5s ease, filter 0.3s ease; display:block; }
+  .img-strip-item:hover img { transform:scale(1.06); filter:sepia(8%) brightness(0.95) contrast(1.05); }
+  .img-strip-cap { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top,rgba(10,8,18,0.9),transparent); padding:24px 12px 12px; opacity:0; transition:opacity 0.3s; }
+  .img-strip-item:hover .img-strip-cap { opacity:1; }
+  .img-strip-cap p { font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); line-height:1.5; }
+  .img-strip-cap span { font-family:'EB Garamond',serif; font-size:11px; letter-spacing:0; text-transform:none; color:rgba(245,237,216,0.5); display:block; margin-top:2px; }
+  #lightbox { display:none; position:fixed; inset:0; z-index:9000; background:rgba(5,4,12,0.95); backdrop-filter:blur(8px); align-items:center; justify-content:center; flex-direction:column; padding:40px; }
+  #lightbox.open { display:flex; }
+  #lightbox img { max-width:90vw; max-height:80vh; object-fit:contain; border:1px solid rgba(201,168,76,0.2); box-shadow:0 0 60px rgba(0,0,0,0.8); }
+  #lb-caption { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(201,168,76,0.6); text-align:center; margin-top:20px; max-width:600px; line-height:1.8; }
+  #lb-close { position:absolute; top:24px; right:32px; font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.2em; color:rgba(201,168,76,0.5); cursor:pointer; transition:color 0.2s; background:none; border:none; text-transform:uppercase; }
+  #lb-close:hover { color:var(--gold); }
+
+  @media (max-width: 640px) { main { padding: 60px 24px 80px; } .intro-block { padding: 32px 28px; } .role-nav { grid-template-columns: repeat(2,1fr); } .back-link { top: 70px; left: 20px; } .img-strip { grid-template-columns: repeat(2,1fr); } }
+
+  @media print {
+    .stars, #edit-bar, #float-toolbar, #link-popup, #toast, #lightbox,
+    nav, .scroll-cue, .ornament, .role-nav, #edit-bar { display: none !important; }
+    body { background: #fff !important; color: #111 !important; font-size: 12pt; }
+    .role-hero, .hero { min-height: auto; padding: 20pt 0 10pt; background: none !important; }
+    .role-hero h1, .hero h1 { -webkit-text-fill-color: #111 !important; background: none; color: #111 !important; font-size: 24pt; }
+    .gold, h2 .gold { color: #7a5a00 !important; }
+    .task-card, .intro-block, .resources, .step, .cluster { border: 1pt solid #ccc !important; background: none !important; break-inside: avoid; }
+    .corner-ornament, .corner { display: none; }
+    .questions li { break-inside: avoid; }
+    .img-strip, .gallery-grid, .hist-gallery { display: none !important; }
+    main { max-width: 100%; padding: 0; }
+    a { color: #00f; text-decoration: underline; }
+    .process-steps { display: block; }
+    .step { margin-bottom: 8pt; }
+    .role-card { border: 1pt solid #ccc !important; break-inside: avoid; color: #111 !important; }
+    .role-card p, .role-card h3 { color: #111 !important; }
+    .prose { color: #111 !important; }
+    .cluster-title, .step h3, .section-eyebrow, .section-label { color: #7a5a00 !important; }
+    .intro-block p, .resources h3, .resource-list li a { color: #111 !important; }
+    .q-num { color: #7a5a00 !important; }
+    .gold-divider { border-top: 0.5pt solid #ccc; height: auto; background: none; }
+    footer { color: #666 !important; border-top: 0.5pt solid #ccc; }
+    .role-hero::before, .hero::before { display: none; }
+    .reveal { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lb-close">✕ Close</button>
+  <img id="lb-img" src="" alt="">
+  <p id="lb-caption"></p>
+</div>
+
+<nav>
+  <a href="king-arthur-webquest.html">Home</a><span class="nav-divider">◆</span>
+  <a href="investigator.html">Investigator</a><span class="nav-divider">◆</span>
+  <a href="adventurer.html" class="active">Adventurer</a><span class="nav-divider">◆</span>
+  <a href="traveler.html">Traveler</a><span class="nav-divider">◆</span>
+  <a href="teacher.html">Teacher</a>
+</nav>
+
+<div class="role-hero">
+  <a href="king-arthur-webquest.html" class="back-link">← Return to Home</a>
+  <div class="role-icon-lg">⚔️</div>
+  <p class="role-badge">Webquest Role Two</p>
+  <h1>The Adventurer</h1>
+  <p class="subtitle">Research Topic: The Knights of the Round Table</p>
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <div class="ornament-diamond"></div>
+    <div class="ornament-line"></div>
+  </div>
+</div>
+
+<div class="gold-divider"></div>
+
+<main>
+
+  <div class="intro-block reveal">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+    <p>Brave Adventurer! Your mission is to unravel the brotherhood of Camelot — the legendary Knights of the Round Table. Who were these noble warriors? What code of honor governed their lives? Who were the most famous among them, and what epic quests did they pursue?</p>
+    <p>Study 2–3 of the research websites listed below, answer the guiding questions carefully, and document everything on your note-taking handout. Your team's presentation will depend on your bravery and thoroughness!</p>
+  </div>
+
+  <div class="section-head reveal">
+    <p class="section-eyebrow">Part One</p>
+    <h2>The Round Table — <span class="gold">Brotherhood &amp; Honor</span></h2>
+  </div>
+  <div class="clusters reveal">
+    <div class="cluster">
+      <p class="cluster-title">The Round Table Itself</p>
+      <ul class="questions">
+        <li><span class="q-num">1.</span><span>What was the Round Table? Why was it built round instead of a traditional rectangular table?</span></li>
+        <li><span class="q-num">2.</span><span>Where did the Round Table come from? Who originally owned it, and how did Arthur obtain it?</span></li>
+        <li><span class="q-num">3.</span><span>What did the Round Table symbolize? Why was equality important to Arthur's vision of knighthood?</span></li>
+        <li><span class="q-num">4.</span><span>What was the "Siege Perilous"? Who was destined to sit in it, and why was it so significant?</span></li>
+        <li><span class="q-num">5.</span><span>How many knights could sit at the Round Table?</span></li>
+      </ul>
+    </div>
+    <div class="cluster">
+      <p class="cluster-title">The Code of Chivalry</p>
+      <ul class="questions">
+        <li><span class="q-num">6.</span><span>What was the Code of Chivalry? List and explain at least five of its key values or principles.</span></li>
+        <li><span class="q-num">7.</span><span>How did the Code of Chivalry shape the behavior of knights in Arthurian legend?</span></li>
+        <li><span class="q-num">8.</span><span>What was a "quest"? Why were quests so important to the knights of the Round Table?</span></li>
+        <li><span class="q-num">9.</span><span>What kinds of tasks were knights expected to perform? Give at least three specific examples.</span></li>
+      </ul>
+    </div>
+    <div class="cluster">
+      <p class="cluster-title">Famous Knights</p>
+      <ul class="questions">
+        <li><span class="q-num">10.</span><span>Who was Sir Lancelot? Why was he considered the greatest knight of the Round Table?</span></li>
+        <li><span class="q-num">11.</span><span>What secret did Lancelot carry, and how did it ultimately harm Camelot?</span></li>
+        <li><span class="q-num">12.</span><span>Who was Sir Galahad? What was his relationship to Lancelot, and why was he considered the purest of all knights?</span></li>
+        <li><span class="q-num">13.</span><span>Who was Sir Gawain? What is he most famous for, and what was his relationship to King Arthur?</span></li>
+        <li><span class="q-num">14.</span><span>Who was Sir Percival (or Perceval)? What quest is he most associated with?</span></li>
+        <li><span class="q-num">15.</span><span>Name two other knights of the Round Table. Briefly describe each one and what they were known for.</span></li>
+      </ul>
+    </div>
+    <div class="cluster">
+      <p class="cluster-title">Legacy of the Knights</p>
+      <ul class="questions">
+        <li><span class="q-num">16.</span><span>How did the fellowship of the Round Table eventually fall apart? What caused its downfall?</span></li>
+        <li><span class="q-num">17.</span><span>Why do you think the Knights of the Round Table still capture people's imaginations today? What ideals do they represent?</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- IMAGES -->
+  <div class="section-head reveal">
+    <p class="section-eyebrow">Historical Artwork</p>
+    <h2>Images of the <span class="gold">Knights</span></h2>
+  </div>
+  <div class="img-strip reveal">
+    <div class="img-strip-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg/800px-Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg" data-caption="The Holy Grail Appears to the Knights of the Round Table · French illuminated manuscript, c. 1400 · BnF · Public Domain">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg/400px-Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg" alt="Holy Grail appears to knights, manuscript" loading="lazy">
+      <div class="img-strip-cap"><p>Holy Grail &amp; Round Table<span>French manuscript, c.1400 · BnF</span></p></div>
+    </div>
+    <div class="img-strip-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Boys_King_Arthur_-_N._C._Wyeth_-_p109.jpg/800px-Boys_King_Arthur_-_N._C._Wyeth_-_p109.jpg" data-caption="Sir Launcelot Fights a Battle · N.C. Wyeth, 1922 · Public Domain">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Boys_King_Arthur_-_N._C._Wyeth_-_p109.jpg/400px-Boys_King_Arthur_-_N._C._Wyeth_-_p109.jpg" alt="Sir Launcelot fights, N.C. Wyeth" loading="lazy">
+      <div class="img-strip-cap"><p>Sir Launcelot in Battle<span>N.C. Wyeth, 1922</span></p></div>
+    </div>
+    <div class="img-strip-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Boys_King_Arthur_-_N._C._Wyeth_-_p247.jpg/800px-Boys_King_Arthur_-_N._C._Wyeth_-_p247.jpg" data-caption="How Sir Tristram Drank of the Love Drink · N.C. Wyeth, 1922 · Public Domain">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Boys_King_Arthur_-_N._C._Wyeth_-_p247.jpg/400px-Boys_King_Arthur_-_N._C._Wyeth_-_p247.jpg" alt="Knights at sea, N.C. Wyeth" loading="lazy">
+      <div class="img-strip-cap"><p>Knights on a Quest<span>N.C. Wyeth, 1922</span></p></div>
+    </div>
+    <div class="img-strip-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg/800px-Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg" data-caption="The Death of King Arthur and Mordred · N.C. Wyeth, 1922 · Public Domain">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg/400px-Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg" alt="Death of Arthur and Mordred, N.C. Wyeth" loading="lazy">
+      <div class="img-strip-cap"><p>The Death of Arthur<span>N.C. Wyeth, 1922</span></p></div>
+    </div>
+  </div>
+
+  <div class="section-head reveal">
+    <p class="section-eyebrow">Your Research Sites</p>
+    <h2>Adventurer <span class="gold">Resources</span></h2>
+  </div>
+  <div class="resources reveal">
+    <h3>Explore 2–3 of the following websites to answer your research questions:</h3>
+    <ul class="resource-list">
+      <li><a href="https://www.kingarthursknights.com" target="_blank" rel="noopener noreferrer">KingArthursKnights.com — Knights of the Round Table</a></li>
+      <li><a href="https://www.britannica.com/topic/Round-Table-Arthurian-legend" target="_blank" rel="noopener noreferrer">Encyclopaedia Britannica — The Round Table</a></li>
+      <li><a href="https://www.history.com/topics/british-history/lancelot" target="_blank" rel="noopener noreferrer">History.com — Sir Lancelot</a></li>
+      <li><a href="https://www.timelessmyths.com/arthurian/roundtable.html" target="_blank" rel="noopener noreferrer">Timeless Myths — Knights of the Round Table</a></li>
+      <li><a href="https://www.britannica.com/topic/chivalry" target="_blank" rel="noopener noreferrer">Encyclopaedia Britannica — Chivalry</a></li>
+      <li><a href="https://www.newworldencyclopedia.org/entry/Knights_of_the_Round_Table" target="_blank" rel="noopener noreferrer">New World Encyclopedia — Knights of the Round Table</a></li>
+    </ul>
+  </div>
+
+  <div class="section-head reveal">
+    <p class="section-eyebrow">Other Roles</p>
+    <h2>Continue the <span class="gold">Quest</span></h2>
+  </div>
+  <div class="role-nav reveal">
+    <a href="investigator.html"><span class="rn-icon">🔍</span><span class="rn-label">Investigator</span></a>
+    <a href="adventurer.html" class="current"><span class="rn-icon">⚔️</span><span class="rn-label">Adventurer</span></a>
+    <a href="traveler.html"><span class="rn-icon">🗺️</span><span class="rn-label">Traveler</span></a>
+    <a href="teacher.html"><span class="rn-icon">📜</span><span class="rn-label">Teacher</span></a>
+  </div>
+
+</main>
+
+<script>
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  const lbCap = document.getElementById('lb-caption');
+  document.querySelectorAll('[data-src]').forEach(item => {
+    item.addEventListener('click', () => { lbImg.src = item.dataset.src; lbCap.textContent = item.dataset.caption || ''; lb.classList.add('open'); });
+  });
+  document.getElementById('lb-close').addEventListener('click', () => lb.classList.remove('open'));
+  lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+</script>
+</body>
+</html>

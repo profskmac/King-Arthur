@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Legend of King Arthur — A Royal Webquest</title>
+<meta name="description" content="An upscale educational webquest exploring King Arthur, the Knights of the Round Table, the Holy Grail, and Medieval life.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="The Legend of King Arthur — A Royal Webquest">
+<meta property="og:description" content="An upscale educational webquest exploring King Arthur, the Knights of the Round Table, the Holy Grail, and Medieval life.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a12">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim: #8a6f2e;
+    --crimson: #7a1c2e;
+    --midnight: #0a0a12;
+    --deep: #0f0f1e;
+    --parchment: #f5edd8;
+    --stone: #2a2438;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--midnight);
+    color: var(--parchment);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ══════════════════════════════════════
+     EDIT BAR (fixed bottom center)
+  ══════════════════════════════════════ */
+  #edit-bar {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(10,10,18,0.96);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 40px;
+    padding: 10px 20px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.08);
+    white-space: nowrap;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #edit-bar.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+  .bar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(201,168,76,0.45);
+    text-transform: uppercase;
+    padding-right: 10px;
+    border-right: 1px solid rgba(201,168,76,0.18);
+    margin-right: 4px;
+  }
+  .bar-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+    padding: 7px 18px;
+    transition: all 0.25s;
+  }
+  #toggle-edit {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    color: var(--midnight);
+    font-weight: 700;
+  }
+  #toggle-edit:hover { opacity: 0.85; transform: translateY(-1px); }
+  #toggle-edit.active {
+    background: linear-gradient(135deg, #e06060, #b03030);
+    color: #fff;
+  }
+  #save-btn {
+    background: rgba(201,168,76,0.1);
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.28);
+    display: none;
+  }
+  #save-btn:hover { background: rgba(201,168,76,0.22); }
+  #reset-btn {
+    background: rgba(200,60,60,0.08);
+    color: rgba(220,120,120,0.75);
+    border: 1px solid rgba(200,60,60,0.18);
+    display: none;
+  }
+  #reset-btn:hover { background: rgba(200,60,60,0.18); color: #e88; }
+  .bar-sep { width: 1px; height: 18px; background: rgba(201,168,76,0.15); }
+  #edit-status {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: rgba(201,168,76,0.5);
+    display: none;
+    padding-left: 4px;
+  }
+  #edit-status.show { display: block; }
+
+  /* ══════════════════════════════════════
+     EDITABLE ELEMENTS
+  ══════════════════════════════════════ */
+  body.edit-mode [data-editable] {
+    outline: 1px dashed rgba(201,168,76,0.22);
+    outline-offset: 3px;
+    cursor: text;
+    border-radius: 2px;
+    transition: outline 0.2s, background 0.2s;
+    position: relative;
+    min-height: 1em;
+  }
+  body.edit-mode [data-editable]:hover {
+    outline: 1px solid rgba(201,168,76,0.5);
+    background: rgba(201,168,76,0.035);
+  }
+  body.edit-mode [data-editable]:focus {
+    outline: 2px solid rgba(201,168,76,0.7);
+    background: rgba(201,168,76,0.055);
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.06);
+  }
+  /* Pencil hint */
+  body.edit-mode [data-editable]:not(:focus):hover::before {
+    content: '✎ edit';
+    position: absolute;
+    top: -22px; right: 0;
+    font-size: 9px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    background: rgba(10,10,18,0.85);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(201,168,76,0.25);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+  }
+
+  /* ══════════════════════════════════════
+     FLOATING TOOLBAR
+  ══════════════════════════════════════ */
+  #float-toolbar {
+    position: fixed;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    gap: 3px;
+    background: rgba(10,10,18,0.97);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.8);
+    backdrop-filter: blur(14px);
+  }
+  #float-toolbar.show { display: flex; }
+  .ft-btn {
+    background: none; border: none;
+    color: rgba(245,237,216,0.55);
+    font-size: 14px; cursor: pointer;
+    padding: 4px 9px; border-radius: 4px;
+    line-height: 1; transition: all 0.15s;
+  }
+  .ft-btn:hover { background: rgba(201,168,76,0.14); color: var(--gold); }
+  .ft-btn.active { background: rgba(201,168,76,0.18); color: var(--gold); }
+  .ft-sep { width: 1px; height: 18px; background: rgba(201,168,76,0.15); margin: 0 2px; }
+  .ft-label {
+    font-family: 'Cinzel', serif; font-size: 8px;
+    letter-spacing: 0.15em; color: rgba(201,168,76,0.35);
+    text-transform: uppercase; padding: 0 4px;
+  }
+
+  /* ══════════════════════════════════════
+     LINK POPUP
+  ══════════════════════════════════════ */
+  #link-popup {
+    position: fixed; z-index: 10001;
+    display: none; flex-direction: column; gap: 10px;
+    background: rgba(10,10,18,0.98);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 10px; padding: 18px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.85);
+    min-width: 290px;
+    backdrop-filter: blur(14px);
+  }
+  #link-popup.show { display: flex; }
+  #link-popup label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.2em; color: var(--gold);
+    text-transform: uppercase;
+  }
+  #link-popup input {
+    background: rgba(42,36,56,0.6);
+    border: 1px solid rgba(201,168,76,0.22);
+    border-radius: 4px; color: var(--parchment);
+    font-family: 'EB Garamond', serif; font-size: 14px;
+    padding: 8px 12px; outline: none; width: 100%;
+  }
+  #link-popup input:focus { border-color: var(--gold); }
+  .popup-btns { display: flex; gap: 8px; }
+  .popup-btn {
+    flex: 1; font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    border: none; border-radius: 4px; padding: 9px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  #link-confirm {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    color: var(--midnight); font-weight: 700;
+  }
+  #link-confirm:hover { opacity: 0.85; }
+  #link-cancel {
+    background: rgba(42,36,56,0.8);
+    color: rgba(245,237,216,0.45);
+    border: 1px solid rgba(201,168,76,0.14);
+  }
+  #link-cancel:hover { color: var(--parchment); }
+
+  /* ══════════════════════════════════════
+     TOAST
+  ══════════════════════════════════════ */
+  #toast {
+    position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: rgba(30,24,44,0.96);
+    border: 1px solid rgba(201,168,76,0.38);
+    border-radius: 20px; padding: 10px 26px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--gold);
+    text-transform: uppercase; opacity: 0;
+    pointer-events: none; transition: all 0.3s; z-index: 10000;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ══════════════════════════════════════
+     STARS
+  ══════════════════════════════════════ */
+  .stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(122,28,46,0.06) 0%, transparent 50%);
+  }
+  .stars::before, .stars::after {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 8%,  rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 22%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 12%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 5%  75%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 33% 88%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 78% 82%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 55%, rgba(201,168,76,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 48% 30%, rgba(201,168,76,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 40%, rgba(201,168,76,0.3) 0%, transparent 100%);
+  }
+  .stars::after {
+    background-image:
+      radial-gradient(1px 1px at 18% 28%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 37% 62%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 52% 18%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 67% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 82% 48%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 44% 95%, rgba(201,168,76,0.4) 0%, transparent 100%);
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: 0.6; } to { opacity: 1; } }
+
+  /* ══════════════════════════════════════
+     NAV
+  ══════════════════════════════════════ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; justify-content: center; align-items: center;
+    background: linear-gradient(to bottom, rgba(10,10,18,0.98), rgba(10,10,18,0.85));
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    backdrop-filter: blur(10px);
+  }
+  nav a {
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: rgba(245,237,216,0.6);
+    text-decoration: none; padding: 18px 22px;
+    transition: color 0.3s; position: relative;
+  }
+  nav a::after {
+    content: ''; position: absolute; bottom: 0;
+    left: 50%; right: 50%; height: 2px;
+    background: var(--gold); transition: left 0.3s, right 0.3s;
+  }
+  nav a:hover { color: var(--gold); }
+  nav a:hover::after { left: 10%; right: 10%; }
+  .nav-divider { color: rgba(201,168,76,0.3); font-size: 12px; }
+
+  /* ══════════════════════════════════════
+     HERO
+  ══════════════════════════════════════ */
+  .hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 120px 40px 80px;
+    z-index: 1; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 80% at 50% 100%, rgba(122,28,46,0.15) 0%, transparent 60%);
+  }
+  .crown-icon {
+    font-size: 48px; margin-bottom: 20px;
+    opacity: 0; animation: fadeUp 1s 0.2s ease forwards;
+    filter: drop-shadow(0 0 20px rgba(201,168,76,0.5));
+  }
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--gold); opacity: 0;
+    animation: fadeUp 1s 0.4s ease forwards; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.8rem, 7vw, 6rem); font-weight: 900; line-height: 1.1;
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dim) 70%, var(--gold) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    opacity: 0; animation: fadeUp 1s 0.6s ease forwards; margin-bottom: 8px;
+    filter: drop-shadow(0 0 40px rgba(201,168,76,0.3));
+  }
+  .hero-subtitle {
+    font-family: 'Cinzel Decorative', serif; font-size: clamp(1rem, 2.5vw, 1.6rem);
+    color: rgba(245,237,216,0.5); opacity: 0;
+    animation: fadeUp 1s 0.8s ease forwards; margin-bottom: 48px;
+  }
+  .ornament {
+    display: flex; align-items: center; gap: 16px;
+    opacity: 0; animation: fadeUp 1s 1s ease forwards; margin-bottom: 56px;
+  }
+  .ornament-line { height: 1px; width: 120px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .ornament-diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 12px rgba(201,168,76,0.6); }
+  .hero-poem {
+    font-style: italic; font-size: 1.1rem; color: rgba(245,237,216,0.65);
+    max-width: 520px; line-height: 2; opacity: 0;
+    animation: fadeUp 1s 1.2s ease forwards; margin-bottom: 60px;
+  }
+  .scroll-cue {
+    position: absolute; bottom: 36px; left: 50%;
+    transform: translateX(-50%); display: flex;
+    flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeIn 1s 2s ease forwards;
+  }
+  .scroll-cue span { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.3em; color: rgba(201,168,76,0.5); }
+  .scroll-arrow { width: 20px; height: 20px; border-right: 1px solid rgba(201,168,76,0.5); border-bottom: 1px solid rgba(201,168,76,0.5); transform: rotate(45deg); animation: bounce 2s ease-in-out infinite; }
+  @keyframes bounce { 0%,100% { transform: rotate(45deg) translateY(0); } 50% { transform: rotate(45deg) translateY(6px); } }
+
+  /* ══════════════════════════════════════
+     SECTIONS
+  ══════════════════════════════════════ */
+  section { position: relative; z-index: 1; padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before { content: ''; display: inline-block; width: 40px; height: 1px; background: var(--gold); }
+  h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+    font-weight: 700; color: var(--parchment);
+    margin-bottom: 28px; line-height: 1.2;
+  }
+  h2 .gold { color: var(--gold); }
+  .prose { color: rgba(245,237,216,0.8); font-size: 1.05rem; max-width: 680px; line-height: 1.9; }
+
+  /* ══════════════════════════════════════
+     INTRO GRID
+  ══════════════════════════════════════ */
+  .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .shield-svg {
+    width: 100%; max-width: 320px; height: auto;
+    display: block; margin: 0 auto;
+    filter: drop-shadow(0 0 40px rgba(201,168,76,0.2));
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+  /* ══════════════════════════════════════
+     TASK CARD
+  ══════════════════════════════════════ */
+  .task-card {
+    background: linear-gradient(135deg, rgba(42,36,56,0.6), rgba(15,15,30,0.8));
+    border: 1px solid rgba(201,168,76,0.2); border-radius: 2px;
+    padding: 60px; position: relative; overflow: hidden;
+  }
+  .task-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .task-card::after  { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .corner-ornament { position: absolute; width: 40px; height: 40px; border-color: rgba(201,168,76,0.4); border-style: solid; }
+  .corner-ornament.tl { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
+  .corner-ornament.tr { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
+  .corner-ornament.bl { bottom: 12px; left: 12px; border-width: 0 0 1px 1px; }
+  .corner-ornament.br { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
+
+  /* ══════════════════════════════════════
+     STEPS
+  ══════════════════════════════════════ */
+  .process-steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; margin-top: 56px; }
+  .step { background: rgba(42,36,56,0.4); border: 1px solid rgba(201,168,76,0.1); padding: 40px 28px; transition: border-color 0.3s, background 0.3s; }
+  .step:hover { border-color: rgba(201,168,76,0.35); background: rgba(42,36,56,0.7); }
+  .step-num { font-family: 'Cinzel Decorative', serif; font-size: 3rem; font-weight: 900; color: rgba(201,168,76,0.12); line-height: 1; margin-bottom: 16px; }
+  .step h3 { font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.1em; color: var(--gold); text-transform: uppercase; margin-bottom: 12px; }
+  .step p { font-size: 0.92rem; color: rgba(245,237,216,0.65); line-height: 1.7; }
+
+  /* ══════════════════════════════════════
+     ROLES
+  ══════════════════════════════════════ */
+  .roles-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px; margin-top: 56px; }
+  .role-card {
+    position: relative; padding: 48px 40px;
+    background: linear-gradient(135deg, rgba(42,36,56,0.5), rgba(15,15,30,0.7));
+    border: 1px solid rgba(201,168,76,0.15);
+    text-decoration: none; color: inherit; display: block;
+    transition: all 0.4s; overflow: hidden;
+  }
+  .role-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.05), transparent 60%); opacity: 0; transition: opacity 0.4s; }
+  .role-card:hover { border-color: rgba(201,168,76,0.45); transform: translateY(-4px); }
+  .role-card:hover::before { opacity: 1; }
+  .role-icon { font-size: 2.4rem; margin-bottom: 20px; display: block; filter: drop-shadow(0 0 10px rgba(201,168,76,0.4)); }
+  .role-card h3 { font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; color: var(--gold); margin-bottom: 12px; }
+  .role-card p { font-size: 0.95rem; color: rgba(245,237,216,0.6); line-height: 1.7; }
+  .role-arrow { position: absolute; bottom: 24px; right: 28px; color: rgba(201,168,76,0.4); font-size: 1.2rem; transition: transform 0.3s, color 0.3s; }
+  .role-card:hover .role-arrow { transform: translate(4px,-4px); color: var(--gold); }
+
+  /* ══════════════════════════════════════
+     IMAGES
+  ══════════════════════════════════════ */
+  .images-section { background: rgba(42,36,56,0.3); border-top: 1px solid rgba(201,168,76,0.1); border-bottom: 1px solid rgba(201,168,76,0.1); padding: 80px 40px; position: relative; z-index: 1; }
+  .images-inner { max-width: 1100px; margin: 0 auto; }
+  .image-links { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-top: 40px; }
+  .image-link {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 24px; border: 1px solid rgba(201,168,76,0.15);
+    background: rgba(15,15,30,0.5); color: rgba(245,237,216,0.7);
+    text-decoration: none; font-family: 'Cinzel', serif;
+    font-size: 0.8rem; letter-spacing: 0.05em; transition: all 0.3s;
+  }
+  .image-link:hover { border-color: rgba(201,168,76,0.4); color: var(--gold); background: rgba(42,36,56,0.5); }
+  .image-link::before { content: '✦'; color: var(--gold); font-size: 0.7rem; flex-shrink: 0; }
+
+  /* ══════════════════════════════════════
+     CONCLUSION
+  ══════════════════════════════════════ */
+  .conclusion { text-align: center; padding: 120px 40px; }
+  .conclusion-inner { max-width: 720px; margin: 0 auto; }
+  .final-question {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--gold); font-style: italic;
+    margin-top: 48px; line-height: 1.6;
+    padding: 32px; border: 1px solid rgba(201,168,76,0.2); position: relative;
+  }
+  .final-question::before,.final-question::after { content: '❧'; color: rgba(201,168,76,0.4); font-size: 1.5rem; display: block; margin: 8px 0; }
+
+  /* ══════════════════════════════════════
+     FOOTER & DIVIDER
+  ══════════════════════════════════════ */
+  footer { text-align: center; padding: 40px; border-top: 1px solid rgba(201,168,76,0.1); font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: rgba(245,237,216,0.25); position: relative; z-index: 1; }
+  .gold-divider { width: 100%; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.3), transparent); position: relative; z-index: 1; }
+
+  /* ══════════════════════════════════════
+     ANIMATIONS
+  ══════════════════════════════════════ */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ══════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════ */
+  /* ══════════════════════════════════════
+     HISTORICAL IMAGE GALLERY
+  ══════════════════════════════════════ */
+  .hist-gallery {
+    position: relative; z-index: 1;
+    background: linear-gradient(to bottom, rgba(15,10,24,0.0), rgba(15,10,24,0.6));
+    padding: 0 0 100px;
+  }
+  .hist-gallery-inner { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
+  .gallery-eyebrow { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .gallery-eyebrow::before { content: ''; display: inline-block; width: 40px; height: 1px; background: var(--gold); }
+  .gallery-title { font-family: 'Cinzel Decorative', serif; font-size: clamp(1.6rem, 3.5vw, 2.8rem); font-weight: 700; color: var(--parchment); margin-bottom: 48px; line-height: 1.2; }
+  .gallery-title .gold { color: var(--gold); }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    gap: 12px;
+  }
+  .gallery-item {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: rgba(20,16,30,0.8);
+  }
+  .gallery-item.tall { grid-row: span 2; }
+  .gallery-item.wide { grid-column: span 2; }
+  .gallery-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: sepia(25%) brightness(0.85) contrast(1.05);
+    transition: transform 0.6s ease, filter 0.4s ease;
+  }
+  .gallery-item:hover img { transform: scale(1.04); filter: sepia(10%) brightness(0.95) contrast(1.05); }
+  .gallery-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(10,8,18,0.92) 0%, transparent 100%);
+    padding: 32px 18px 16px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .gallery-item:hover .gallery-caption { opacity: 1; }
+  .gallery-caption p { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); line-height: 1.5; }
+  .gallery-caption span { font-family: 'EB Garamond', serif; font-size: 12px; letter-spacing: 0; text-transform: none; color: rgba(245,237,216,0.55); display: block; margin-top: 3px; }
+
+  /* Lightbox */
+  #lightbox {
+    display: none; position: fixed; inset: 0; z-index: 9000;
+    background: rgba(5,4,12,0.95); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; flex-direction: column;
+    padding: 40px;
+  }
+  #lightbox.open { display: flex; }
+  #lightbox img { max-width: 90vw; max-height: 80vh; object-fit: contain; border: 1px solid rgba(201,168,76,0.2); box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+  #lb-caption { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,168,76,0.6); text-align: center; margin-top: 20px; max-width: 600px; line-height: 1.8; }
+  #lb-close { position: absolute; top: 24px; right: 32px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.2em; color: rgba(201,168,76,0.5); cursor: pointer; transition: color 0.2s; background: none; border: none; text-transform: uppercase; }
+  #lb-close:hover { color: var(--gold); }
+
+  @media (max-width: 768px) {
+    .intro-grid,.roles-grid,.image-links { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .task-card { padding: 40px 28px; }
+    nav { flex-wrap: wrap; }
+    #edit-bar { bottom: 16px; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-item.tall { grid-row: span 1; }
+    .gallery-item.wide { grid-column: span 2; }
+  }
+
+  /* In edit mode, prevent card navigation */
+  body.edit-mode .role-card,
+  body.edit-mode .image-link { pointer-events: none; }
+  body.edit-mode [data-editable] { pointer-events: all; }
+
+  @media print {
+    .stars, #edit-bar, #float-toolbar, #link-popup, #toast, #lightbox,
+    nav, .scroll-cue, .ornament, .role-nav, #edit-bar { display: none !important; }
+    body { background: #fff !important; color: #111 !important; font-size: 12pt; }
+    .role-hero, .hero { min-height: auto; padding: 20pt 0 10pt; background: none !important; }
+    .role-hero h1, .hero h1 { -webkit-text-fill-color: #111 !important; background: none; color: #111 !important; font-size: 24pt; }
+    .gold, h2 .gold { color: #7a5a00 !important; }
+    .task-card, .intro-block, .resources, .step, .cluster { border: 1pt solid #ccc !important; background: none !important; break-inside: avoid; }
+    .corner-ornament, .corner { display: none; }
+    .questions li { break-inside: avoid; }
+    .img-strip, .gallery-grid, .hist-gallery { display: none !important; }
+    main { max-width: 100%; padding: 0; }
+    a { color: #00f; text-decoration: underline; }
+    .process-steps { display: block; }
+    .step { margin-bottom: 8pt; }
+    .role-card { border: 1pt solid #ccc !important; break-inside: avoid; color: #111 !important; }
+    .role-card p, .role-card h3 { color: #111 !important; }
+    .prose { color: #111 !important; }
+    .cluster-title, .step h3, .section-eyebrow, .section-label { color: #7a5a00 !important; }
+    .intro-block p, .resources h3, .resource-list li a { color: #111 !important; }
+    .q-num { color: #7a5a00 !important; }
+    .gold-divider { border-top: 0.5pt solid #ccc; height: auto; background: none; }
+    footer { color: #666 !important; border-top: 0.5pt solid #ccc; }
+    .role-hero::before, .hero::before { display: none; }
+    .reveal { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ EDIT BAR ══ -->
+<div id="edit-bar">
+  <span class="bar-label">✦ Royal Editor</span>
+  <button class="bar-btn" id="toggle-edit">Edit Mode</button>
+  <div class="bar-sep"></div>
+  <button class="bar-btn" id="save-btn">Save</button>
+  <button class="bar-btn" id="reset-btn">Reset</button>
+  <span id="edit-status">● Editing Active</span>
+</div>
+
+<!-- ══ FLOATING FORMAT TOOLBAR ══ -->
+<div id="float-toolbar">
+  <span class="ft-label">Format</span>
+  <div class="ft-sep"></div>
+  <button class="ft-btn" id="ft-bold" title="Bold"><b>B</b></button>
+  <button class="ft-btn" id="ft-italic" title="Italic"><i>I</i></button>
+  <button class="ft-btn" id="ft-under" title="Underline"><u>U</u></button>
+  <div class="ft-sep"></div>
+  <button class="ft-btn" id="ft-link" title="Edit Link">🔗</button>
+  <div class="ft-sep"></div>
+  <button class="ft-btn" id="ft-clear" title="Clear Formatting">✕</button>
+</div>
+
+<!-- ══ LINK POPUP ══ -->
+<div id="link-popup">
+  <label>Link Text</label>
+  <input type="text" id="lp-text" placeholder="Display text…">
+  <label>URL</label>
+  <input type="url" id="lp-url" placeholder="https://…">
+  <div class="popup-btns">
+    <button class="popup-btn" id="link-ok">Apply ✦</button>
+    <button class="popup-btn" id="link-x">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast">Changes saved for this session ✦</div>
+
+<!-- ══ PAGE ══ -->
+<div class="stars"></div>
+
+<nav>
+  <a href="king-arthur-webquest.html">Home</a><span class="nav-divider">◆</span>
+  <a href="investigator.html">Investigator</a><span class="nav-divider">◆</span>
+  <a href="adventurer.html">Adventurer</a><span class="nav-divider">◆</span>
+  <a href="traveler.html">Traveler</a><span class="nav-divider">◆</span>
+  <a href="teacher.html">Teacher</a><span class="nav-divider">◆</span>
+  <a href="#presentation">Presentation</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="crown-icon">♛</div>
+  <p class="hero-eyebrow" data-editable contenteditable="false">A Royal Webquest</p>
+  <h1 data-editable contenteditable="false">The Legend of<br>King Arthur</h1>
+  <p class="hero-subtitle" data-editable contenteditable="false">Research &amp; Adventure Awaits</p>
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <div class="ornament-diamond"></div>
+    <div class="ornament-line"></div>
+  </div>
+  <p class="hero-poem" data-editable contenteditable="false">In a land lost to the mists of time,<br>
+    Where valor and honor forged a rhyme,<br>
+    There lived a king, noble and true,<br>
+    Whose legend sparked hearts anew...</p>
+  <div class="scroll-cue"><span>Begin</span><div class="scroll-arrow"></div></div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- INTRO -->
+<section class="reveal" style="padding-top:120px;padding-bottom:80px;">
+  <div class="intro-grid">
+    <div class="intro-text">
+      <p class="section-label" data-editable contenteditable="false">Hail &amp; Welcome, Brave Knight</p>
+      <h2 data-editable contenteditable="false">Your Quest <span class="gold">Begins</span> Here</h2>
+      <p class="prose" data-editable contenteditable="false">Now, put on your armor and brace yourself, brave knight! For we need your help in resolving this mysterious plight. The time has come to embark on your most important journey — you shall investigate the legendary King Arthur himself.</p>
+      <br>
+      <p class="prose" data-editable contenteditable="false">Learn about his origins, the Knights of the Round Table, life during the Middle Ages, and take a quest for the Holy Grail. May your strength and fortitude serve ye well!</p>
+    </div>
+    <div class="intro-visual">
+      <svg class="shield-svg" viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1a1528"/><stop offset="100%" style="stop-color:#0a0a12"/>
+          </linearGradient>
+          <linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#e8c96a"/><stop offset="50%" style="stop-color:#c9a84c"/><stop offset="100%" style="stop-color:#8a6f2e"/>
+          </linearGradient>
+        </defs>
+        <path d="M150 10 L280 50 L280 180 Q280 290 150 330 Q20 290 20 180 L20 50 Z" fill="url(#sg)" stroke="url(#gg)" stroke-width="2.5"/>
+        <path d="M150 28 L262 62 L262 178 Q262 272 150 308 Q38 272 38 178 L38 62 Z" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="150" y1="45" x2="150" y2="295" stroke="url(#gg)" stroke-width="2.5"/>
+        <line x1="55" y1="140" x2="245" y2="140" stroke="url(#gg)" stroke-width="2.5"/>
+        <g transform="translate(150,90)">
+          <rect x="-30" y="10" width="60" height="16" rx="2" fill="url(#gg)" opacity="0.9"/>
+          <polygon points="-30,10 -22,-8 -14,4 -6,-12 2,4 10,-8 18,4 26,-12 30,10" fill="url(#gg)" opacity="0.9"/>
+          <circle cx="-22" cy="-8" r="4" fill="url(#gg)" opacity="0.8"/>
+          <circle cx="-6" cy="-13" r="4" fill="url(#gg)" opacity="0.8"/>
+          <circle cx="10" cy="-9" r="4" fill="url(#gg)" opacity="0.8"/>
+          <circle cx="26" cy="-13" r="4" fill="url(#gg)" opacity="0.8"/>
+        </g>
+        <g transform="translate(150,215) scale(0.55)" opacity="0.85">
+          <path d="M0,-40 C-15,-30 -30,-10 -35,10 C-40,30 -25,50 0,55 C25,50 40,30 35,10 C30,-10 15,-30 0,-40Z" fill="url(#gg)" opacity="0.7"/>
+          <path d="M-35,10 C-55,-5 -60,15 -45,25" stroke="url(#gg)" stroke-width="3" fill="none"/>
+          <path d="M35,10 C55,-5 60,15 45,25" stroke="url(#gg)" stroke-width="3" fill="none"/>
+        </g>
+        <text x="75" y="155" text-anchor="middle" font-size="22" fill="url(#gg)" opacity="0.7">✦</text>
+        <text x="225" y="155" text-anchor="middle" font-size="22" fill="url(#gg)" opacity="0.7">✦</text>
+        <circle cx="150" cy="10" r="5" fill="url(#gg)"/>
+        <circle cx="280" cy="50" r="4" fill="url(#gg)"/>
+        <circle cx="20" cy="50" r="4" fill="url(#gg)"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- TASK -->
+<section id="task" class="reveal">
+  <p class="section-label" data-editable contenteditable="false">Your Mission</p>
+  <h2 data-editable contenteditable="false">The <span class="gold">Royal</span> Task</h2>
+  <div class="task-card">
+    <div class="corner-ornament tl"></div><div class="corner-ornament tr"></div>
+    <div class="corner-ornament bl"></div><div class="corner-ornament br"></div>
+    <p class="prose" style="max-width:100%;" data-editable contenteditable="false">Your quest begins at once. You will be working in teams of four valiant knights. Each member of the team will be responsible for reading the information on the designated sites, gathering intelligence, and completing a note-taking scroll and source citation document recording all that has been learned.</p>
+    <br>
+    <p class="prose" style="max-width:100%;" data-editable contenteditable="false">Once individual research is complete, you and your team will cooperatively assemble a grand slide presentation on King Arthur and the world of medieval times. The realm depends on your thoroughness — do not disappoint the crown!</p>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- PROCESS -->
+<section id="process" class="reveal">
+  <p class="section-label" data-editable contenteditable="false">The Journey Unfolds</p>
+  <h2 data-editable contenteditable="false">The <span class="gold">Process</span></h2>
+  <p class="prose" data-editable contenteditable="false">Follow these steps to complete your quest with honor and distinction.</p>
+  <div class="process-steps">
+    <div class="step">
+      <div class="step-num">I</div>
+      <h3 data-editable contenteditable="false">Explore</h3>
+      <p data-editable contenteditable="false">Examine the designated websites for your assigned role. Seek important details from 2–3 sources.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">II</div>
+      <h3 data-editable contenteditable="false">Document</h3>
+      <p data-editable contenteditable="false">Take thorough notes on a handout and record all source citations as you conduct your research.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">III</div>
+      <h3 data-editable contenteditable="false">Gather</h3>
+      <p data-editable contenteditable="false">Reconvene with your team and share the knowledge you have acquired from across the realm.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">IV</div>
+      <h3 data-editable contenteditable="false">Create</h3>
+      <p data-editable contenteditable="false">Collaborate to craft a slide presentation filled with details and imagery of Arthur's legendary world.</p>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- ROLES -->
+<section id="roles" class="reveal">
+  <p class="section-label" data-editable contenteditable="false">Choose Your Path</p>
+  <h2 data-editable contenteditable="false">Webquest <span class="gold">Roles</span></h2>
+  <p class="prose" data-editable contenteditable="false">Select your webquest role to advance upon the journey. Each path holds unique knowledge. Your adventure awaits...</p>
+  <div class="roles-grid">
+    <a href="investigator.html" class="role-card" id="investigator">
+      <span class="role-icon">🔍</span>
+      <h3 data-editable contenteditable="false">The Investigator</h3>
+      <p data-editable contenteditable="false">Uncover the origins of King Arthur, the legend of Excalibur, and the truth behind the Arthurian myths. Separate fact from legend.</p>
+      <span class="role-arrow">↗</span>
+    </a>
+    <a href="adventurer.html" class="role-card" id="adventurer">
+      <span class="role-icon">⚔️</span>
+      <h3 data-editable contenteditable="false">The Adventurer</h3>
+      <p data-editable contenteditable="false">Explore the Knights of the Round Table — their code of chivalry, their famous quests, and their brotherhood of honor.</p>
+      <span class="role-arrow">↗</span>
+    </a>
+    <a href="traveler.html" class="role-card" id="traveler">
+      <span class="role-icon">🗺️</span>
+      <h3 data-editable contenteditable="false">The Traveler</h3>
+      <p data-editable contenteditable="false">Journey into the mystery of the Holy Grail — its origins, its powers, and the quest to find it across the medieval world.</p>
+      <span class="role-arrow">↗</span>
+    </a>
+    <a href="teacher.html" class="role-card" id="teacher">
+      <span class="role-icon">📜</span>
+      <h3 data-editable contenteditable="false">The Teacher</h3>
+      <p data-editable contenteditable="false">Bring history to life by researching daily existence in the Middle Ages — castles, feudal society, knights, and medieval culture.</p>
+      <span class="role-arrow">↗</span>
+    </a>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- IMAGE RESOURCES -->
+<div class="images-section reveal">
+  <div class="images-inner">
+    <p class="section-label" data-editable contenteditable="false">Visual Resources</p>
+    <h2 data-editable contenteditable="false">Royal <span class="gold">Image Gallery</span></h2>
+    <p class="prose" data-editable contenteditable="false">Seek these sources when gathering images and illustrations for your presentation scrolls.</p>
+    <div class="image-links">
+      <a href="http://www.arthuriana.org/teaching/graphics.html" class="image-link" target="_blank" rel="noopener noreferrer" data-editable contenteditable="false">King Arthur Graphic Images &amp; Photos</a>
+      <a href="http://classroomclipart.com/clipart/History/Middle_Ages/Knights.htm" class="image-link" target="_blank" rel="noopener noreferrer" data-editable contenteditable="false">Medieval Clipart &amp; Illustrations — Knights</a>
+      <a href="http://classroomclipart.com/clipart/History/Middle_Ages.htm" class="image-link" target="_blank" rel="noopener noreferrer" data-editable contenteditable="false">Middle Ages Historical Pictures</a>
+      <a href="https://pixabay.com/" class="image-link" target="_blank" rel="noopener noreferrer" data-editable contenteditable="false">Pixabay — Search "Medieval" or "Knights"</a>
+    </div>
+  </div>
+</div>
+
+<div class="gold-divider"></div>
+
+<!-- PRESENTATION -->
+<section id="presentation" class="reveal" style="text-align:center;">
+  <p class="section-label" style="justify-content:center;" data-editable contenteditable="false">Final Deliverable</p>
+  <h2 data-editable contenteditable="false">Group Slide <span class="gold">Presentation</span></h2>
+  <p class="prose" style="margin:0 auto 40px;" data-editable contenteditable="false">When your research is complete and your scrolls are filled with knowledge, bring your findings together. Collaborate with your fellow knights to build the grand presentation that will tell the tale of King Arthur to all.</p>
+  <a href="#roles" style="display:inline-flex;align-items:center;gap:12px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--midnight);background:linear-gradient(135deg,var(--gold-light),var(--gold));padding:18px 40px;text-decoration:none;transition:opacity 0.3s,transform 0.3s;" onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='none'" data-editable contenteditable="false">Begin Your Quest ✦</a>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- CONCLUSION -->
+<section class="conclusion reveal">
+  <div class="conclusion-inner">
+    <p class="section-label" style="justify-content:center;" data-editable contenteditable="false">The Journey's End</p>
+    <h2 data-editable contenteditable="false">Well Done, <span class="gold">Faithful Knights!</span></h2>
+    <p class="prose" style="margin:0 auto;" data-editable contenteditable="false">Well, lookie here — I hope my eyes are not deceiving me! You've survived the journey. Congratulations! During your voyage, you've explored medieval life, the mysterious King Arthur, the brave and chivalrous Knights of the Round Table, and the legendary Holy Grail. Whether you've solved this mystery or not... only time will tell.</p>
+    <div class="final-question" data-editable contenteditable="false">Was King Arthur real,<br>or just a legend noble and fair?</div>
+  </div>
+</section>
+
+<div class="gold-divider"></div>
+
+<!-- HISTORICAL IMAGE GALLERY -->
+<div class="hist-gallery reveal">
+  <div class="hist-gallery-inner">
+    <p class="gallery-eyebrow">Historical &amp; Artistic Record</p>
+    <h2 class="gallery-title">Images from the <span class="gold">Arthurian Age</span></h2>
+
+    <div class="gallery-grid">
+
+      <!-- Tall left: Howard Pyle - King Arthur of Britain -->
+      <div class="gallery-item tall" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Arthur-Pyle_King_Arthur_of_Britain.JPG/600px-Arthur-Pyle_King_Arthur_of_Britain.JPG" data-caption="King Arthur of Britain · Howard Pyle, 1903 · Public Domain">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Arthur-Pyle_King_Arthur_of_Britain.JPG/600px-Arthur-Pyle_King_Arthur_of_Britain.JPG" alt="King Arthur of Britain by Howard Pyle" loading="lazy">
+        <div class="gallery-caption"><p>King Arthur of Britain<span>Howard Pyle, 1903 · Public Domain</span></p></div>
+      </div>
+
+      <!-- Top middle: Holy Grail Round Table manuscript -->
+      <div class="gallery-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg/800px-Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg" data-caption="The Holy Grail Appears to the Knights of the Round Table · French illuminated manuscript, c. 1400 · Bibliothèque nationale de France · Public Domain">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg/600px-Holy-grail-round-table-bnf-ms_fr-116F-f610v-15th-detail.jpg" alt="Holy Grail appears to knights, 15th century manuscript" loading="lazy">
+        <div class="gallery-caption"><p>The Holy Grail Appears to the Knights<span>French illuminated manuscript, c. 1400 · BnF</span></p></div>
+      </div>
+
+      <!-- Top right: Crane - Excalibur from the Lake -->
+      <div class="gallery-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/CRANE_King_Arthur_asks_the_lady_of_the_lake_for_the_sword_Excalibur.jpg/600px-CRANE_King_Arthur_asks_the_lady_of_the_lake_for_the_sword_Excalibur.jpg" data-caption="King Arthur Receives Excalibur from the Lady of the Lake · Walter Crane, 1911 · Public Domain">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/CRANE_King_Arthur_asks_the_lady_of_the_lake_for_the_sword_Excalibur.jpg/600px-CRANE_King_Arthur_asks_the_lady_of_the_lake_for_the_sword_Excalibur.jpg" alt="King Arthur receives Excalibur, Walter Crane" loading="lazy">
+        <div class="gallery-caption"><p>Arthur Receives Excalibur<span>Walter Crane, 1911 · Public Domain</span></p></div>
+      </div>
+
+      <!-- Bottom middle: N.C. Wyeth - Sword in the Stone -->
+      <div class="gallery-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Boys_King_Arthur_-_N._C._Wyeth_-_p16.jpg/800px-Boys_King_Arthur_-_N._C._Wyeth_-_p16.jpg" data-caption="Arthur Draws the Sword from the Stone · N.C. Wyeth, 1922 · Public Domain">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Boys_King_Arthur_-_N._C._Wyeth_-_p16.jpg/600px-Boys_King_Arthur_-_N._C._Wyeth_-_p16.jpg" alt="Arthur draws sword from stone, N.C. Wyeth" loading="lazy">
+        <div class="gallery-caption"><p>Arthur Draws the Sword from the Stone<span>N.C. Wyeth, 1922 · Public Domain</span></p></div>
+      </div>
+
+      <!-- Bottom right: N.C. Wyeth - Death of Arthur & Mordred -->
+      <div class="gallery-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg/800px-Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg" data-caption="The Death of King Arthur and Mordred · N.C. Wyeth, 1922 · Public Domain">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg/600px-Boys_King_Arthur_-_N._C._Wyeth_-_p306.jpg" alt="Death of Arthur and Mordred, N.C. Wyeth" loading="lazy">
+        <div class="gallery-caption"><p>The Death of Arthur &amp; Mordred<span>N.C. Wyeth, 1922 · Public Domain</span></p></div>
+      </div>
+
+      <!-- Wide bottom: Charles Ernest Butler - King Arthur -->
+      <div class="gallery-item wide" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Charles_Ernest_Butler_-_King_Arthur.jpg/1200px-Charles_Ernest_Butler_-_King_Arthur.jpg" data-caption="King Arthur · Charles Ernest Butler, 1903 · Public Domain">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Charles_Ernest_Butler_-_King_Arthur.jpg/900px-Charles_Ernest_Butler_-_King_Arthur.jpg" alt="King Arthur by Charles Ernest Butler" loading="lazy" style="min-height:260px; object-position: center top;">
+        <div class="gallery-caption"><p>King Arthur<span>Charles Ernest Butler, 1903 · Public Domain</span></p></div>
+      </div>
+
+      <!-- Last: Voyage to Avalon -->
+      <div class="gallery-item" data-src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Frank_William_Warwick_Topham_Voyage_of_King_Arthur_and_Morgan_Le_Fay_to_the_Isle_of_Avalon_1888.jpg/900px-Frank_William_Warwick_Topham_Voyage_of_King_Arthur_and_Morgan_Le_Fay_to_the_Isle_of_Avalon_1888.jpg" data-caption="Voyage of King Arthur and Morgan le Fay to the Isle of Avalon · Frank Topham, 1888 · Public Domain">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Frank_William_Warwick_Topham_Voyage_of_King_Arthur_and_Morgan_Le_Fay_to_the_Isle_of_Avalon_1888.jpg/600px-Frank_William_Warwick_Topham_Voyage_of_King_Arthur_and_Morgan_Le_Fay_to_the_Isle_of_Avalon_1888.jpg" alt="Voyage to Avalon by Frank Topham" loading="lazy">
+        <div class="gallery-caption"><p>The Voyage to Avalon<span>Frank Topham, 1888 · Public Domain</span></p></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lb-close">✕ Close</button>
+  <img id="lb-img" src="" alt="">
+  <p id="lb-caption"></p>
+</div>
+
+<footer>
+  <p data-editable contenteditable="false">Copyright 2015 · Teen Tech University · King Arthur Research Webquest</p>
+</footer>
+
+<!-- ══════════════════════════════════════
+     EDITOR SCRIPT
+══════════════════════════════════════ -->
+<script>
+(function () {
+  /* ── refs ── */
+  const body        = document.body;
+  const toggleBtn   = document.getElementById('toggle-edit');
+  const saveBtn     = document.getElementById('save-btn');
+  const resetBtn    = document.getElementById('reset-btn');
+  const statusEl    = document.getElementById('edit-status');
+  const toolbar     = document.getElementById('float-toolbar');
+  const linkPopup   = document.getElementById('link-popup');
+  const lpText      = document.getElementById('lp-text');
+  const lpUrl       = document.getElementById('lp-url');
+  const toast       = document.getElementById('toast');
+  const editables   = Array.from(document.querySelectorAll('[data-editable]'));
+
+  /* ── state ── */
+  let isEditing     = false;
+  let activeEl      = null;
+  let savedContents = {}; // in-memory snapshot on save
+  let origContents  = {}; // original HTML for reset
+
+  /* ── capture originals ── */
+  editables.forEach((el, i) => {
+    if (!el.id) el.id = 'ed-' + i;
+    origContents[el.id] = el.innerHTML;
+  });
+
+  /* ── Toggle Edit Mode ── */
+  toggleBtn.addEventListener('click', () => {
+    isEditing = !isEditing;
+    body.classList.toggle('edit-mode', isEditing);
+    toggleBtn.textContent  = isEditing ? '✕  Exit Editing' : 'Edit Mode';
+    toggleBtn.classList.toggle('active', isEditing);
+    saveBtn.style.display  = isEditing ? 'block' : 'none';
+    resetBtn.style.display = isEditing ? 'block' : 'none';
+    statusEl.classList.toggle('show', isEditing);
+
+    editables.forEach(el => {
+      el.contentEditable = isEditing ? 'true' : 'false';
+    });
+
+    if (!isEditing) {
+      toolbar.classList.remove('show');
+      linkPopup.classList.remove('show');
+      activeEl = null;
+    } else {
+      showToast('Click any text to edit it ✦');
+    }
+  });
+
+  /* ── Save ── */
+  saveBtn.addEventListener('click', () => {
+    editables.forEach(el => { savedContents[el.id] = el.innerHTML; });
+    showToast('Page saved for this session ✦');
+  });
+
+  /* ── Reset ── */
+  resetBtn.addEventListener('click', () => {
+    if (!confirm('Reset all content back to its original text?')) return;
+    editables.forEach(el => { el.innerHTML = origContents[el.id]; });
+    showToast('Content reset to original ✦');
+  });
+
+  /* ── Toolbar positioning ── */
+  function positionToolbar(el) {
+    const sel  = window.getSelection();
+    let rect   = null;
+    if (sel && sel.rangeCount > 0) {
+      rect = sel.getRangeAt(0).getBoundingClientRect();
+    }
+    if (!rect || rect.width === 0) {
+      rect = el.getBoundingClientRect();
+    }
+    const tbW  = 220; // approx toolbar width
+    let top    = rect.top + window.scrollY - 48;
+    let left   = rect.left + window.scrollX + (rect.width / 2) - (tbW / 2);
+    left = Math.max(8, Math.min(left, window.innerWidth - tbW - 8));
+    toolbar.style.top  = top + 'px';
+    toolbar.style.left = left + 'px';
+  }
+
+  function showToolbar(el) {
+    toolbar.classList.add('show');
+    positionToolbar(el);
+    refreshToolbarState();
+  }
+
+  function hideToolbar() {
+    // small delay so toolbar clicks register
+    setTimeout(() => {
+      if (!toolbar.matches(':focus-within') && !linkPopup.matches(':focus-within')) {
+        toolbar.classList.remove('show');
+      }
+    }, 180);
+  }
+
+  function refreshToolbarState() {
+    document.getElementById('ft-bold').classList.toggle('active',  document.queryCommandState('bold'));
+    document.getElementById('ft-italic').classList.toggle('active', document.queryCommandState('italic'));
+    document.getElementById('ft-under').classList.toggle('active',  document.queryCommandState('underline'));
+  }
+
+  /* ── Attach editable events ── */
+  editables.forEach(el => {
+    el.addEventListener('focus', () => {
+      if (!isEditing) return;
+      activeEl = el;
+      showToolbar(el);
+    });
+    el.addEventListener('blur', () => {
+      if (!isEditing) return;
+      hideToolbar();
+    });
+    el.addEventListener('keyup', refreshToolbarState);
+    el.addEventListener('mouseup', () => { if (isEditing) { positionToolbar(el); refreshToolbarState(); } });
+    el.addEventListener('input', () => { /* live, no-op needed */ });
+  });
+
+  /* ── Prevent link clicks in edit mode ── */
+  document.addEventListener('click', e => {
+    if (!isEditing) return;
+    const a = e.target.closest('a');
+    if (a && a.hasAttribute('data-editable')) e.preventDefault();
+  });
+
+  /* ── Format buttons ── */
+  function fmtBtn(id, cmd) {
+    document.getElementById(id).addEventListener('mousedown', e => {
+      e.preventDefault();
+      document.execCommand(cmd);
+      refreshToolbarState();
+    });
+  }
+  fmtBtn('ft-bold',   'bold');
+  fmtBtn('ft-italic', 'italic');
+  fmtBtn('ft-under',  'underline');
+  document.getElementById('ft-clear').addEventListener('mousedown', e => {
+    e.preventDefault();
+    document.execCommand('removeFormat');
+    refreshToolbarState();
+  });
+
+  /* ── Link button ── */
+  document.getElementById('ft-link').addEventListener('mousedown', e => {
+    e.preventDefault();
+    const el   = activeEl;
+    const isA  = el && el.tagName === 'A';
+    lpText.value = el ? el.textContent.trim() : '';
+    lpUrl.value  = isA ? (el.getAttribute('href') || '') : '';
+
+    // Position below toolbar
+    const tbRect = toolbar.getBoundingClientRect();
+    linkPopup.style.top  = (tbRect.bottom + window.scrollY + 8) + 'px';
+    linkPopup.style.left = Math.max(8, tbRect.left) + 'px';
+    linkPopup.classList.add('show');
+    setTimeout(() => lpText.focus(), 50);
+  });
+
+  document.getElementById('link-ok').addEventListener('click', () => {
+    const text = lpText.value.trim();
+    const url  = lpUrl.value.trim();
+    if (activeEl && activeEl.tagName === 'A') {
+      if (text) activeEl.textContent = text;
+      if (url)  activeEl.setAttribute('href', url);
+    }
+    linkPopup.classList.remove('show');
+  });
+  document.getElementById('link-x').addEventListener('click', () => {
+    linkPopup.classList.remove('show');
+  });
+
+  /* ── Toast ── */
+  let toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  /* ── Scroll reveal ── */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  document.querySelectorAll('.step, .role-card').forEach((el, i) => {
+    el.style.transitionDelay = (i % 4) * 0.1 + 's';
+    el.classList.add('reveal');
+    observer.observe(el);
+  });
+
+  /* ── Teacher mode: Ctrl+E or triple-tap bottom-right to reveal edit bar ── */
+  const editBar = document.getElementById('edit-bar');
+  let tapCount = 0, tapTimer = null;
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+      e.preventDefault();
+      editBar.classList.toggle('visible');
+      if (editBar.classList.contains('visible')) {
+        showToast('Teacher Mode Active — Click "Edit Mode" to edit ✦');
+      }
+    }
+  });
+
+  // Triple-tap bottom-right corner (mobile teacher access)
+  document.addEventListener('touchend', e => {
+    const t = e.changedTouches[0];
+    if (t.clientX > window.innerWidth * 0.8 && t.clientY > window.innerHeight * 0.8) {
+      tapCount++;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => { tapCount = 0; }, 600);
+      if (tapCount >= 3) {
+        tapCount = 0;
+        editBar.classList.toggle('visible');
+        if (editBar.classList.contains('visible')) {
+          showToast('Teacher Mode Active ✦');
+        }
+      }
+    }
+  });
+
+  /* ── Lightbox ── */
+  const lb     = document.getElementById('lightbox');
+  const lbImg  = document.getElementById('lb-img');
+  const lbCap  = document.getElementById('lb-caption');
+  const lbClose = document.getElementById('lb-close');
+  document.querySelectorAll('.gallery-item').forEach(item => {
+    item.addEventListener('click', () => {
+      lbImg.src = item.dataset.src;
+      lbCap.textContent = item.dataset.caption || '';
+      lb.classList.add('open');
+    });
+  });
+  lbClose.addEventListener('click', () => lb.classList.remove('open'));
+  lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+})();
+</script>
+</body>
+</html>
